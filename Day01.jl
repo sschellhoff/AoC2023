@@ -1,17 +1,17 @@
 include("./AoC.jl")
 using .AoC: getDayInput, getDayInputLines, getDayInputBlocks
 
-function replaceNumbers(s)
-    s = replace(s, "one" => "one1one")
-    s = replace(s, "two" => "two2two")
-    s = replace(s, "three" => "three3three")
-    s = replace(s, "four" => "four4four")
-    s = replace(s, "five" => "five5five")
-    s = replace(s, "six" => "six6six")
-    s = replace(s, "seven" => "seven7seven")
-    s = replace(s, "eight" => "eight8eight")
-    s = replace(s, "nine" => "nine9nine")
-    return s
+function replaceNumbers(line)
+    line = replace(line, "one" => "one1one")
+    line = replace(line, "two" => "two2two")
+    line = replace(line, "three" => "three3three")
+    line = replace(line, "four" => "four4four")
+    line = replace(line, "five" => "five5five")
+    line = replace(line, "six" => "six6six")
+    line = replace(line, "seven" => "seven7seven")
+    line = replace(line, "eight" => "eight8eight")
+    line = replace(line, "nine" => "nine9nine")
+    return line
 end
 
 function numbersFromLine(line, withReplace = false)

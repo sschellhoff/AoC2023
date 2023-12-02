@@ -1,5 +1,4 @@
 module AoC
-export getDayInput, getDayInputLines, getDayInputBlocks
 
 function getFileContent(filename)
     file = open("data/$filename")
@@ -8,20 +7,20 @@ function getFileContent(filename)
     return content
 end
 
-function getDayInput(day)
+function getDayInput(day, suffix="")
     filename = lpad(day, 2, '0')
     fileending = "txt"
-    getFileContent("$filename.$fileending")
+    getFileContent("$filename$suffix.$fileending")
 end
 
-function getDayInputLines(day)
-    content = getDayInput(day)
+function getDayInputLines(day, suffix="")
+    content = getDayInput(day, suffix)
     lines = split(content, '\n')
     lines
 end
 
-function getDayInputBlocks(day)
-    content = getDayInput(day)
+function getDayInputBlocks(day, suffix="")
+    content = getDayInput(day, suffix)
     lines = split(content, "\n\n")
     lines
 end
