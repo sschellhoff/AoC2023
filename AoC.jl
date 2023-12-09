@@ -25,4 +25,8 @@ function getDayInputBlocks(day, suffix="")
     lines
 end
 
+function getInts(text::Union{String, SubString{String}})::Vector{Int64}
+    [parse(Int64, m.match) for m in eachmatch(r"[+-]?\d+", text)]
+end
+
 end
