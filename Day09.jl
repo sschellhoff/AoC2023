@@ -1,7 +1,5 @@
 include("./AoC.jl")
-using .AoC: getDayInputLines, getInts
-
-slidingWindow(collection, stepSize::Int64, windowSize::Int64) = ((@view collection[i:i+windowSize-1]) for i in 1:stepSize:length(collection)-windowSize+1)
+using .AoC: getDayInputLines, getInts, slidingWindow
 
 function extrapolateEnd(numbers::Vector{Int64})::Int64
     differences = map(e -> e[2] -  e[1], slidingWindow(numbers, 1, 2))

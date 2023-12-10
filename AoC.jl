@@ -29,4 +29,6 @@ function getInts(text::Union{String, SubString{String}})::Vector{Int64}
     [parse(Int64, m.match) for m in eachmatch(r"[+-]?\d+", text)]
 end
 
+slidingWindow(collection, stepSize::Int64, windowSize::Int64) = ((@view collection[i:i+windowSize-1]) for i in 1:stepSize:length(collection)-windowSize+1)
+
 end
