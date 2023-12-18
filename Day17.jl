@@ -1,5 +1,6 @@
 include("./AoC.jl")
 using .AoC: getDayInputLines
+using DataStructures
 
 @enum Direction up down left right
 
@@ -29,7 +30,7 @@ getCost(position::Tuple{Int, Int}, grid::Grid) = let(x, y) = position
     grid.data[y, x]
 end
 
-function next(grid::Grid, position::Tuple{Int, Int}, lastDirection::Direction, sameDirectionCount::Int, lastCost::Int)
+function next(grid::Grid, position::Tuple{Int, Int}, lastDirection::Direction, sameDirectionCount::Int, lastCost::Int, minSameDirection::Int, maxSameDirection::Int)
     posUp = (position[1], position[2] - 1)
     posDown = (position[1], position[2] + 1)
     posLeft = (position[1] - 1, position[2])
@@ -38,81 +39,95 @@ function next(grid::Grid, position::Tuple{Int, Int}, lastDirection::Direction, s
 
     result = []
     if lastDirection == up
-        if isInBounds(posUp, grid) && sameDirectionCount < 3
-            push!(result, (calcCost(posUp), posUp, right, sameDirectionCount + 1))
+        if isInBounds(posUp, grid) && sameDirectionCount < maxSameDirection
+            push!(result, (calcCost(posUp), posUp, up, sameDirectionCount + 1))
         end
-        if isInBounds(posLeft, grid)
+        if isInBounds(posLeft, grid) && sameDirectionCount >= minSameDirection
             push!(result, (calcCost(posLeft), posLeft, left, 1))
         end
-        if isInBounds(posRight, grid)
+        if isInBounds(posRight, grid) && sameDirectionCount >= minSameDirection
             push!(result, (calcCost(posRight), posRight, right, 1))
         end
     elseif lastDirection == down
-        if isInBounds(posDown, grid) && sameDirectionCount < 3
+        if isInBounds(posDown, grid) && sameDirectionCount < maxSameDirection
             push!(result, (calcCost(posDown), posDown, down, sameDirectionCount + 1))
         end
-        if isInBounds(posLeft, grid)
+        if isInBounds(posLeft, grid) && sameDirectionCount >= minSameDirection
             push!(result, (calcCost(posLeft), posLeft, left, 1))
         end
-        if isInBounds(posRight, grid)
+        if isInBounds(posRight, grid) && sameDirectionCount >= minSameDirection
             push!(result, (calcCost(posRight), posRight, right, 1))
         end
     elseif lastDirection == left
-        if isInBounds(posLeft, grid) && sameDirectionCount < 3
+        if isInBounds(posLeft, grid) && sameDirectionCount < maxSameDirection
             push!(result, (calcCost(posLeft), posLeft, left, sameDirectionCount + 1))
         end
-        if isInBounds(posUp, grid)
+        if isInBounds(posUp, grid) && sameDirectionCount >= minSameDirection
             push!(result, (calcCost(posUp), posUp, up, 1))
         end
-        if isInBounds(posDown, grid)
+        if isInBounds(posDown, grid) && sameDirectionCount >= minSameDirection
             push!(result, (calcCost(posDown), posDown, down, 1))
         end
     elseif lastDirection == right
-        if isInBounds(posRight, grid) && sameDirectionCount < 3
+        if isInBounds(posRight, grid) && sameDirectionCount < maxSameDirection
             push!(result, (calcCost(posRight), posRight, right, sameDirectionCount + 1))
         end
-        if isInBounds(posUp, grid)
+        if isInBounds(posUp, grid) && sameDirectionCount >= minSameDirection
             push!(result, (calcCost(posUp), posUp, up, 1))
         end
-        if isInBounds(posDown, grid)
+        if isInBounds(posDown, grid) && sameDirectionCount >= minSameDirection
             push!(result, (calcCost(posDown), posDown, down, 1))
         end
     end
     result
 end
 
-function find(grid::Grid, start::Tuple{Int, Int}, target::Tuple{Int, Int})
+function find(grid::Grid, start::Tuple{Int, Int}, target::Tuple{Int, Int}, minSameDirection::Int, maxSameDirection::Int)
     currentPosition = (start[1], start[2])
     currentDirection = right
     currentCost = 0
     sameDirectionCount = 0
     manhattanDistance(pos::Tuple{Int, Int}) = abs(target[1] - pos[1]) + abs(target[2] - pos[2])
+   
+    #pred = Dict()
 
-    states = [(currentCost, currentPosition, currentDirection, sameDirectionCount)]
+    states = PriorityQueue()
+    push!(states, (currentCost, currentPosition, currentDirection, sameDirectionCount) => 0)
     visited = Dict()
-    while currentPosition != target
-        (currentCost, currentPosition, currentDirection, sameDirectionCount) = pop!(sort!(states, by=x -> x[1], rev=true))# + manhattanDistance(x[2])))
-        #println(currentPosition)
-        if haskey(visited, (currentPosition, currentDirection, sameDirectionCount)) && visited[(currentPosition, currentDirection, sameDirectionCount)] <= currentCost
+
+    while currentPosition != target || sameDirectionCount < minSameDirection
+        (currentCost, currentPosition, currentDirection, sameDirectionCount) = dequeue!(states)
+        key = (currentPosition, currentDirection, sameDirectionCount)
+        if haskey(visited, key) && visited[key] <= currentCost
             continue
         end
-        visited[(currentPosition, currentDirection, sameDirectionCount)] = currentCost
+        visited[key] = currentCost
 
-        for state in next(grid, currentPosition, currentDirection, sameDirectionCount, currentCost)
-            #key = (state[2], state[3])
-            #if haskey(visited, key) && visited[key] <= state[1]
-            #    continue
-            #end
-            push!(states, state)
+        for state in next(grid, currentPosition, currentDirection, sameDirectionCount, currentCost, minSameDirection, maxSameDirection)
+            #nextKey = (state[2], state[3], state[4])
+            #pred[(nextKey, state[1])] = (key, currentCost)
+
+            push!(states, state => state[1])
         end
     end
+    #c = ((currentPosition, currentDirection, sameDirectionCount), currentCost)
+    #path = []
+    #while c[1][1] != start
+    #    push!(path, c)
+    #    println("HERE ", c)
+    #    c = pred[c]
+    #end
+    #println("HERE ", c)
+    #push!(path, c)
+    #println(path)
     currentCost
 end
 
 function main()
     lines = getDayInputLines(17)
     grid = createGrid(lines)
-    println(find(grid, (1, 1), (grid.width, grid.height)))
+    println(find(grid, (1, 1), (grid.width, grid.height), 0, 3))
+    println(find(grid, (1, 1), (grid.width, grid.height), 4, 10))
 end
 
 main()
