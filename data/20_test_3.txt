@@ -1,0 +1,10 @@
+broadcaster -> a1, b1, c1, a2
+%a1 -> b1
+%b1 -> c1
+%c1 -> inv1
+&inv1 -> qb
+%a2 -> inv2, con2
+&inv2 -> b2
+%b2 -> con2
+&con2 -> qb
+&qb -> rx

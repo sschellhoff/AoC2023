@@ -68,12 +68,12 @@ pulseSource(pulse) = pulse[1]
 pulseTarget(pulse) = pulse[3]
 
 function applyPulseToFlipFlop(name, value, part)
-    if value
+    if value # high pulse
         []
-    elseif part[2]
+    elseif part[2] # low pulse and high state
         part[2] = false
         map(d -> (name, false, d), part[3])
-    else
+    else # low pulse and low state
         part[2] = true
         map(d -> (name, true, d), part[3])
     end
@@ -180,6 +180,20 @@ function prettyPrint(circuit)
     end
 end
 
+function printFlipFlops(circuit)
+    for (k, v) in circuit
+        tag = partTag(v)
+        if tag == FlipFlop
+            print(k, ": ")
+            for d in v[2]
+                print(d, " ")
+            end
+            print(";\t")
+        end
+    end
+    println()
+end
+
 function sumPulses(pulseCounts, neededCycles, extraPushesNeeded)
     (lowCycle, highCycle) = last(pulseCounts)
     (lowExtra, highExtra) = if extraPushesNeeded > 0
@@ -190,23 +204,149 @@ function sumPulses(pulseCounts, neededCycles, extraPushesNeeded)
     (neededCycles * lowCycle + lowExtra, neededCycles * highCycle + highExtra)
 end
 
+function getSourcesFor(destination, circuit)
+    sources = Set()
+    for (partName, part) in circuit
+        tag = partTag(part)
+        if tag == Source
+            # 2
+            if destination in part[2]
+                push!(sources, partName)
+            end
+        elseif tag == Sink
+            # []
+        elseif tag == Conjunction
+            # 3
+            if destination in part[3]
+                push!(sources, partName)
+            end
+        elseif tag == FlipFlop
+            # 3
+            if destination in part[3]
+                push!(sources, partName)
+            end
+        else
+            throw("unknown part type")
+        end
+    end
+    sources
+end
+
+function getSubGraphForDestination(circuit, destination)
+    goToRx = Set()
+    push!(goToRx, destination)
+    alreadyChecked = []
+    while length(goToRx) > 0
+        dest = pop!(goToRx)
+        push!(alreadyChecked, dest)
+        sources = getSourcesFor(dest, circuit)
+        for source in sources
+            if source ∉ alreadyChecked
+                push!(goToRx, source)
+            end
+        end
+    end
+    allNames = Set(keys(circuit))
+    canRemove = collect(setdiff(allNames, Set(alreadyChecked)))
+    prunedCircuit = deepcopy(circuit)
+    for name in canRemove
+        delete!(prunedCircuit, name)
+        deleteat!(prunedCircuit["broadcaster"][2], findall(x -> x == name, prunedCircuit["broadcaster"][2]))
+    end
+    prunedCircuit["qb"] = [Conjunction, [[destination, false]], ["rx"]]
+    prunedCircuit["rx"] = [Sink]
+    prunedCircuit
+end
+
+function findCircleInSubCircuit(circuit, destination)
+    circuit = getSubGraphForDestination(circuit, destination)
+    l = 0
+
+    while true
+        l += 1
+        #println(l)
+        pulses = [("button", false, "broadcaster")]
+        while length(pulses) > 0
+            pulse = popfirst!(pulses)
+            (s, v, d) = pulse
+            if !v && d == "rx"
+                return l
+            end
+            
+            append!(pulses, applyPulse(pulse, circuit))
+        end
+
+        if isCircuitInStartConfiguration(circuit)
+            return l
+        end
+    end
+end
+
+function toGraphViz(circuit)
+    filename = "graph.dot"
+    io = open(filename, "w")
+    write(io, "strict digraph {\n")
+    for (name, part) in circuit
+        tag = partTag(part)
+        if tag == Source
+            write(io, "$(name) [color=\"green\"]\n")
+            for dest in part[2]
+                write(io, "\t$(name) -> $(dest)\n")
+            end
+        elseif tag == Sink
+            write(io, "$(name) [color=\"red\"]\n")
+            # no egde
+        elseif tag == FlipFlop
+            write(io, "$(name) [color=\"yellow\"]\n")
+            for dest in part[3]
+                write(io, "\t$(name) -> $(dest)\n")
+            end
+        elseif tag == Conjunction
+            write(io, "$(name) [color=\"blue\"]\n")
+            for dest in part[3]
+                write(io, "\t$(name) -> $(dest)\n")
+            end
+        else
+            throw("unknown part type")
+        end
+    end
+    write(io, "}\n")
+    close(io)
+    println("graph written to $(filename)")
+end
+
 function main()
     lines = getDayInputLines(20)
     circuit = buildCircuit(map(parsePart, lines))
+    circuitCopy = deepcopy(circuit)
     #prettyPrint(circuit)
-    
+
     numberOfPushes = 1000
     pulseCounts = runUntilStartConfiguration(circuit, numberOfPushes)
     cycleLength = length(pulseCounts)
     neededCycles = trunc(Int, numberOfPushes / cycleLength)
     neededExtraRuns = numberOfPushes % cycleLength
+    
     #neededPushes = neededCycles + neededExtraRuns
     #println("cycle length: ", cycleLength)
     #println("needed cycled: ", neededCycles)
     #println("needed extra runs: ", neededExtraRuns)
     #println("needed pushes: ", neededPushes)
+    
     (low, high) = sumPulses(pulseCounts, neededCycles, neededExtraRuns)
     println("result: ", low * high)
+    
+    println()
+    c1 = findCircleInSubCircuit(circuitCopy, "rz")
+    println()
+    c2 = findCircleInSubCircuit(circuitCopy, "mr")
+    println()
+    c3 = findCircleInSubCircuit(circuitCopy, "kv")
+    println()
+    c4 = findCircleInSubCircuit(circuitCopy, "jg")
+    println()
+    println(lcm(c1, c2, c3, c4))
+    #toGraphViz(circuit)
 end
 
 main()

@@ -1,0 +1,170 @@
+strict digraph {
+nk [color="yellow"]
+	nk -> dr
+qv [color="yellow"]
+	qv -> cx
+bc [color="yellow"]
+	bc -> sv
+	bc -> tp
+kf [color="yellow"]
+	kf -> rd
+bv [color="yellow"]
+	bv -> sk
+	bv -> kf
+br [color="yellow"]
+	br -> sk
+	br -> hc
+rj [color="yellow"]
+	rj -> lx
+	rj -> qz
+dx [color="yellow"]
+	dx -> gt
+	dx -> dr
+tz [color="yellow"]
+	tz -> sv
+	tz -> ng
+fr [color="yellow"]
+	fr -> mx
+	fr -> sv
+xp [color="yellow"]
+	xp -> br
+	xp -> sk
+vk [color="yellow"]
+	vk -> lz
+tp [color="yellow"]
+	tp -> sv
+	tp -> lm
+jz [color="yellow"]
+	jz -> ct
+kv [color="blue"]
+	kv -> qb
+tj [color="yellow"]
+	tj -> dr
+	tj -> dx
+nt [color="yellow"]
+	nt -> qz
+	nt -> px
+df [color="yellow"]
+	df -> qz
+	df -> jd
+nf [color="yellow"]
+	nf -> sk
+ks [color="yellow"]
+	ks -> fc
+dz [color="yellow"]
+	dz -> fr
+hq [color="yellow"]
+	hq -> bz
+lm [color="yellow"]
+	lm -> sv
+rx [color="red"]
+sv [color="blue"]
+	sv -> xk
+	sv -> rz
+	sv -> zv
+	sv -> dz
+	sv -> mx
+hc [color="yellow"]
+	hc -> sk
+	hc -> nf
+rd [color="yellow"]
+	rd -> qv
+broadcaster [color="green"]
+	broadcaster -> cn
+	broadcaster -> xk
+	broadcaster -> rj
+	broadcaster -> gf
+tq [color="yellow"]
+	tq -> tj
+rl [color="yellow"]
+	rl -> bv
+	rl -> sk
+qz [color="blue"]
+	qz -> vk
+	qz -> qm
+	qz -> rj
+	qz -> kv
+	qz -> hq
+	qz -> tk
+dr [color="blue"]
+	dr -> cn
+	dr -> jz
+	dr -> tq
+	dr -> ks
+	dr -> mr
+	dr -> ct
+cn [color="yellow"]
+	cn -> dr
+	cn -> mq
+jd [color="yellow"]
+	jd -> qz
+lx [color="yellow"]
+	lx -> qm
+	lx -> qz
+nd [color="yellow"]
+	nd -> dr
+	nd -> nk
+mr [color="blue"]
+	mr -> qb
+qm [color="yellow"]
+	qm -> nt
+cf [color="yellow"]
+	cf -> sv
+	cf -> tz
+qb [color="blue"]
+	qb -> rx
+bz [color="yellow"]
+	bz -> vk
+	bz -> qz
+sk [color="blue"]
+	sk -> qv
+	sk -> kf
+	sk -> rd
+	sk -> qh
+	sk -> jg
+	sk -> gf
+px [color="yellow"]
+	px -> qz
+	px -> tk
+xk [color="yellow"]
+	xk -> sv
+	xk -> zv
+cx [color="yellow"]
+	cx -> sk
+	cx -> qh
+zv [color="yellow"]
+	zv -> dz
+qh [color="yellow"]
+	qh -> xp
+jg [color="blue"]
+	jg -> qb
+rz [color="blue"]
+	rz -> qb
+mq [color="yellow"]
+	mq -> jz
+	mq -> dr
+gf [color="yellow"]
+	gf -> rl
+	gf -> sk
+ct [color="yellow"]
+	ct -> ks
+bn [color="yellow"]
+	bn -> sv
+	bn -> cf
+tk [color="yellow"]
+	tk -> hq
+mx [color="yellow"]
+	mx -> bn
+fc [color="yellow"]
+	fc -> dr
+	fc -> tq
+gt [color="yellow"]
+	gt -> dr
+	gt -> nd
+ng [color="yellow"]
+	ng -> bc
+	ng -> sv
+lz [color="yellow"]
+	lz -> qz
+	lz -> df
+}
